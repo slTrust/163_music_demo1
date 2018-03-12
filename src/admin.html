@@ -24,6 +24,8 @@
         <p>文件大小不能超过40mb</p>
     </div>
     <div id="uploadStatus"></div>
+    <ul id="music_list">
+    </ul>
     <audio controls src="http://p5h9wznrb.bkt.clouddn.com/Beyond%20-%20%E5%85%89%E8%BE%89%E5%B2%81%E6%9C%88.mp3"></audio>
     <script src="../node_modules/leancloud-storage/dist/av-min.js"></script>
     <script>
@@ -63,13 +65,9 @@
                     runtimes: 'html5',    //上传模式,依次退化
                     browse_button: 'xxx',       //上传选择的点选按钮，**必需**
                     uptoken_url: 'http://localhost:8888/uptoken',            //Ajax请求upToken的Url，**强烈建议设置**（服务端提供）
-                    // uptoken : '', //若未指定uptoken_url,则必须指定 uptoken ,uptoken由其他程序生成
-                    // unique_names: true, // 默认 false，key为文件名。若开启该选项，SDK为自动生成上传成功后的key（文件名）。
-                    // save_key: true,   // 默认 false。若在服务端生成uptoken的上传策略中指定了 `sava_key`，则开启，SDK会忽略对key的处理
-                    // p5h9wznrb.bkt.clouddn.com 我申请的七牛空间的域名
-                    domain: 'http://qiniu-plupload.qiniudn.com/',   //bucket 域名，下载资源时用到，**必需**
+                    domain: 'p5h9wznrb.bkt.clouddn.com',   // 你的七牛空间的 域名链接 下载使用
+                    //  bucket 域名，下载资源时用到，**必需**
                     get_new_uptoken: false,  //设置上传文件的时候是否每次都重新获取新的token
-                    // container: 'container',           //上传区域DOM ID，默认是browser_button的父元素，
                     max_file_size: '40mb',           //最大文件体积限制
                     dragdrop: true,                   //开启可拖曳上传
                     drop_element: 'yyy',        //拖曳上传区域元素的ID，拖曳文件或文件夹后可触发上传
@@ -102,6 +100,23 @@
                             // var domain = up.getOption('domain');
                             // var res = parseJSON(info.response);
                             // var sourceLink = domain + res.key; 获取上传成功后的文件的Url
+
+                            // 上面的示例是伪代码   你要猜
+                            var domain = up.getOption('domain');
+                            var res = JSON.parse(info.response);
+                            // 获取上传成功后的文件的Url encodeURIComponent(解析中文内容的请求体)
+                            var sourceLink = 'http://' + domain + '/' + encodeURIComponent(res.key); 
+                            console.log(sourceLink)
+                            var ul = document.querySelector('#music_list');
+                            var oLi = document.createElement('li');
+                            oLi.className = 'info';
+                            oLi.innerHTML = `
+                                <div>
+                                    <a href="${sourceLink}">${sourceLink}</a><br/>
+                                    <p>歌曲名：${res.key}</p>
+                                </div>
+                            `;
+                            ul.appendChild(oLi)
                         },
                         'Error': function(up, err, errTip) {
                                 //上传出错时,处理相关的事情
