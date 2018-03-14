@@ -58,10 +58,14 @@
                     // 获取上传成功后的文件的Url encodeURIComponent(解析中文内容的请求体)
                     var sourceLink = 'http://' + domain + '/' + encodeURIComponent(res.key); 
                     console.log(sourceLink)
-                    console.log({
+                    
+                    // 分发
+                    window.eventHub.emit('upload',{
                         link:sourceLink,
                         key:res.key
                     })
+                    
+                    
                 },
                 'Error': function(up, err, errTip) {
                         //上传出错时,处理相关的事情

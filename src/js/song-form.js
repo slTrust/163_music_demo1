@@ -39,6 +39,11 @@
             this.view = view;
             this.model = model;
             this.view.redner(this.model.data)
+             // 订阅
+             window.eventHub.on('upload',(data)=>{
+                console.log('song-form 模块得到了 data');
+                console.log(data);
+            })
         }
     }
 
