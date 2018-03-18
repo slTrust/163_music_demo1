@@ -26,9 +26,20 @@
     let model = {
         data:{
             songs:[
-                {id:1,name:'1'},
-                {id:1,name:'2'},
+                // {id:1,name:'1',url:''},
             ]
+        },
+        find(){
+            var query = new AV.Query('Song');
+           return query.find().then(
+                (songs)=>{
+                    console.log(songs)
+                    this.data.songs = songs.map((song)=>{
+                        return {id:song.id,...song.attributes}
+                    });
+                    return this.data.songs
+                },
+                (err)=>{});
         }
     }
     let container = {
@@ -44,6 +55,10 @@
                 this.model.data.songs.push(songData)
                 this.view.render(this.model.data);
             })
+            this.model.find().then(()=>{
+                this.view.render(this.model.data); 
+            })
+            
         }
     }
     container.init(view,model)
