@@ -9,7 +9,7 @@
                 <label>
                 歌名
                 </label>
-                <input type="text">
+                <input type="text" value="__key__">
             </div>
             <div class="row">
                 <label>
@@ -21,15 +21,20 @@
                 <label>
                 外链
                 </label>
-                <input type="text">
+                <input type="text" value="__link__">
             </div>
             <div class="row actions">
                 <button type="submit">保存</button>
             </div>
         </form>
         `,
-        redner(data){
-            $(this.el).html(this.template)
+        render(data = {}){
+            let placeholders = ['key','link']
+            let html = this.template;
+            placeholders.map((string)=>{
+                html = html.replace(`__${string}__`,data[string]||'');
+            })
+            $(this.el).html(html)
         }
     }
 
@@ -38,12 +43,16 @@
         init(view,model){
             this.view = view;
             this.model = model;
-            this.view.redner(this.model.data)
+            this.view.render(this.model.data)
              // 订阅
              window.eventHub.on('upload',(data)=>{
                 console.log('song-form 模块得到了 data');
-                console.log(data);
+                this.view.render(data);
             })
+        },
+        reset(data){
+            console.log('reset')
+            this.view.render(data)
         }
     }
 
