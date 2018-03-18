@@ -61,8 +61,8 @@
                     
                     // 分发
                     window.eventHub.emit('upload',{
-                        link:sourceLink,
-                        key:res.key
+                        url:sourceLink,
+                        name:res.key
                     })
                     
                     

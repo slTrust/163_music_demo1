@@ -2,6 +2,9 @@
 {
     let view = {
         el:".page > main",
+        init(){
+            this.$el = $(this.el)
+        },
         template:`
         <h1>新建歌曲</h1>
         <form class="form">
@@ -9,19 +12,19 @@
                 <label>
                 歌名
                 </label>
-                <input type="text" value="__key__">
+                <input name="name" type="text" value="__name__">
             </div>
             <div class="row">
                 <label>
                 歌手
                 </label>
-                <input type="text">
+                <input name="singer" type="text" value="__singer__">
             </div>
             <div class="row">
                 <label>
                 外链
                 </label>
-                <input type="text" value="__link__">
+                <input name="url" type="text" value="__url__">
             </div>
             <div class="row actions">
                 <button type="submit">保存</button>
@@ -29,30 +32,97 @@
         </form>
         `,
         render(data = {}){
-            let placeholders = ['key','link']
+            let placeholders = ['name','singer','url','id']
             let html = this.template;
             placeholders.map((string)=>{
                 html = html.replace(`__${string}__`,data[string]||'');
             })
             $(this.el).html(html)
+        },
+        reset(){
+            this.render({})
         }
     }
 
-    let model = {}
+    let model = {
+        data:{
+            name:'',
+            singer:'',
+            url:'',
+            id:''
+        },
+        create(data){
+            // 声明类型
+            var Song = AV.Object.extend('Song');
+            // 新建对象
+            var Song = new Song();
+            // 设置名称
+            Song.set('name',data.name);
+            Song.set('singer',data.singer);
+            Song.set('url',data.url);
+            return Song.save().then((newSong)=>{
+                // 第一傻  挨个赋值
+                // let id = newSong.id;
+                // let attributes = newSong.attributes;
+                // es6 解构赋值
+                let {id,attributes} = newSong;
+                // 第二傻 挨个赋值
+                // this.data.id = id;
+                // this.data.singer = attributes;
+                //  es6语法
+                // 可以把 属性挨个赋值到data里
+                /*
+                Object.assign(this.data,{
+                    id:id,
+                    name:attributes.name,
+                    singer:attributes.singer,
+                    url:attributes.url
+                })
+                */
+                // 第三傻  还是傻  直接用解构赋值
+                Object.assign(this.data,{id, ...attributes})
+            }, (error)=>{
+                console.error(error);
+            });
+        }
+    }
     let controller = {
         init(view,model){
             this.view = view;
+            this.view.init();
             this.model = model;
-            this.view.render(this.model.data)
+            this.view.render(this.model.data);
+            this.bindEvents();
              // 订阅
              window.eventHub.on('upload',(data)=>{
                 console.log('song-form 模块得到了 data');
-                this.view.render(data);
+                this.model.data = data;
+                this.view.render(this.model.data);
             })
         },
-        reset(data){
-            console.log('reset')
-            this.view.render(data)
+        bindEvents(){
+            // 事件委托  因为一开始  form是没有的  它是 render之后才有的
+            this.view.$el.on('submit','form',(e)=>{
+                e.preventDefault();
+                let needs = 'name singer url'.split(' ');
+                let data = {}
+                needs.map((string)=>{
+                    data[string] = this.view.$el.find(`[name="${string}"]`).val();
+                })
+                //真正的提交交给 model
+                this.model.create(data).then(
+                    ()=>{
+                        // 成功后清空表单
+                        console.log(this.model.data)
+                        this.view.reset();
+                        // 发布消息
+                        let string = JSON.stringify(this.model.data);
+                        let obj = JSON.parse(string)
+                        window.eventHub.emit('create',obj);
+                    },
+                    ()=>{}
+                );
+            })
         }
     }
 

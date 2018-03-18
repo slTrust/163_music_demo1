@@ -31,34 +31,7 @@
     </div>        
    
     <script src="../node_modules/leancloud-storage/dist/av-min.js"></script>
-    <script>
-        var APP_ID = 'vFy3IFVjkbnreQpGoFMBI5XH-gzGzoHsz';
-        var APP_KEY = 'u0wYKOvd2LS8EQf51sjvcE1b';
-
-        AV.init({
-            appId: APP_ID,
-            appKey: APP_KEY
-        });
-
-   
-
-        // //创建数据库
-        // var TestObject = AV.Object.extend('Playlist');
-        // // 创建一条记录
-        // var testObject = new TestObject();
-        // // 保存记录
-        // testObject.save({
-        //     name:'test',
-        //     cover:'test',//封面
-        //     createrId:'',//创建者id    
-        //     description:'简介',//
-        //     songs:['1','2'],//歌单
-        // }).then(function(object) {
-        // alert('LeanCloud Rocks!');
-        // },()=>{
-        //     alert('fuck')
-        // })
-    </script>
+    <script src="./js/initializers/av.js"></script>
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
     <script src="./vendors/moxie.js"></script>
     <script src="../node_modules/plupload/js/plupload.min.js"></script>
