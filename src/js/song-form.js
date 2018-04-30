@@ -65,29 +65,24 @@
             Song.set('singer',data.singer);
             Song.set('url',data.url);
             return Song.save().then((newSong)=>{
-                // 第一傻  挨个赋值
-                // let id = newSong.id;
-                // let attributes = newSong.attributes;
-                // es6 解构赋值
                 let {id,attributes} = newSong;
-                // 第二傻 挨个赋值
-                // this.data.id = id;
-                // this.data.singer = attributes;
-                //  es6语法
-                // 可以把 属性挨个赋值到data里
-                /*
-                Object.assign(this.data,{
-                    id:id,
-                    name:attributes.name,
-                    singer:attributes.singer,
-                    url:attributes.url
-                })
-                */
-                // 第三傻  还是傻  直接用解构赋值
                 Object.assign(this.data,{id, ...attributes})
             }, (error)=>{
                 console.error(error);
             });
+        },
+        update(data){
+             //真正的提交交给 model
+             var song = AV.Object.createWithoutData('Song',JSON.parse(JSON.stringify(this.data.id)));
+             // 修改属性
+             song.set('name', data.name);
+             song.set('singer', data.singer);
+             song.set('url', data.url);
+             // 保存到云端
+             return song.save().then((response)=>{
+                 Object.assign(this.data,data)
+                 return response;
+             });
         }
     }
     let controller = {
@@ -114,28 +109,49 @@
                 this.view.render(this.model.data)
             })
         },
+        create(){
+            let needs = 'name singer url'.split(' ');
+            let data = {}
+            needs.map((string)=>{
+                data[string] = this.view.$el.find(`[name="${string}"]`).val();
+            })
+            //真正的提交交给 model
+            this.model.create(data).then(
+                ()=>{
+                    // 成功后清空表单
+                    console.log(this.model.data)
+                    this.view.reset();
+                    // 发布消息
+                    let string = JSON.stringify(this.model.data);
+                    let obj = JSON.parse(string)
+                    window.eventHub.emit('create',obj);
+                },
+                ()=>{}
+            );
+        },
+        update(){
+            let needs = 'name singer url'.split(' ');
+            let data = {}
+            needs.map((string)=>{
+                data[string] = this.view.$el.find(`[name="${string}"]`).val();
+            })
+            this.model.update(data).then(()=>{
+                window.eventHub.emit('update',JSON.parse(JSON.stringify(this.model.data)))
+            },()=>{
+                alert('更新失败')
+            })
+        },
         bindEvents(){
             // 事件委托  因为一开始  form是没有的  它是 render之后才有的
             this.view.$el.on('submit','form',(e)=>{
                 e.preventDefault();
-                let needs = 'name singer url'.split(' ');
-                let data = {}
-                needs.map((string)=>{
-                    data[string] = this.view.$el.find(`[name="${string}"]`).val();
-                })
-                //真正的提交交给 model
-                this.model.create(data).then(
-                    ()=>{
-                        // 成功后清空表单
-                        console.log(this.model.data)
-                        this.view.reset();
-                        // 发布消息
-                        let string = JSON.stringify(this.model.data);
-                        let obj = JSON.parse(string)
-                        window.eventHub.emit('create',obj);
-                    },
-                    ()=>{}
-                );
+
+                //根据 歌曲id区分 编辑/新建
+                if(this.model.data.id){
+                    this.update();
+                }else{
+                    this.create()
+                }
             })
         }
     }
