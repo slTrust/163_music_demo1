@@ -76,9 +76,6 @@
                         break;
                     }
                 }
-                console.log('循环后获取选中的歌曲信息')
-                console.log(data)
-                console.log('````````')
                //选择歌曲列表就取消 创建歌曲的激活态，同时歌曲的信息显示在main区域
 
                //传递歌曲信息 注意对象的深拷贝问题这里不能传 data因为是引用  
@@ -95,6 +92,9 @@
                 this.model.data.songs.push(songData)
                 this.view.render(this.model.data);
             }) 
+            window.eventHub.on('new',()=>{
+                this.view.clearActive()
+            })
         }
     }
     container.init(view,model)
