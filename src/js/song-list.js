@@ -65,10 +65,25 @@
         bindEvents(){
             //点击歌曲就激活 ，同时移除新建歌曲的激活态
             $(this.view.el).on('click','li',(e)=>{
-               this.view.activeItem(e.currentTarget)
-               let songId = e.currentTarget.getAttribute('data-song-id')
+                this.view.activeItem(e.currentTarget)
+                let songId = e.currentTarget.getAttribute('data-song-id')
+                //根据歌曲id查找歌曲信息发布到 编辑区(main部分)
+                let data;
+                let songs = this.model.data.songs;
+                for(var i=0;i<songs.length;i++){
+                    if(songs[i].id===songId){
+                        data = songs[i]
+                        break;
+                    }
+                }
+                console.log('循环后获取选中的歌曲信息')
+                console.log(data)
+                console.log('````````')
                //选择歌曲列表就取消 创建歌曲的激活态，同时歌曲的信息显示在main区域
-               window.eventHub.emit('select',{id:songId})
+
+               //传递歌曲信息 注意对象的深拷贝问题这里不能传 data因为是引用  
+               //let object =  JSON.parse(JSON.stringify(data))
+               window.eventHub.emit('select',JSON.parse(JSON.stringify(data)))
             })
         },
         bindEventHub(){

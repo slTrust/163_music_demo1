@@ -99,6 +99,12 @@
                 this.model.data = data;
                 this.view.render(this.model.data);
             })
+
+            //用户选择了歌曲列表中一个，就处于编辑状态
+            window.eventHub.on('select',(data)=>{
+                this.model.data = data;
+                this.view.render(this.model.data)
+            })
         },
         bindEvents(){
             // 事件委托  因为一开始  form是没有的  它是 render之后才有的
