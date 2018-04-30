@@ -8,9 +8,13 @@
         render(data){
             let $el = $(this.el)
             $el.html(this.template);
-            let {songs} = data;
+            let {songs,selectSongId} = data;
             let liList = songs.map((song)=>{
-                return $('<li></li>').text(song.name).attr('data-song-id',song.id)
+                let $li =  $('<li></li>').text(song.name).attr('data-song-id',song.id);
+                if(song.id===selectSongId){
+                    $li.addClass('active')
+                }
+                return $li;
             })
             // $(this.el).html(this.template)
             liList.map((domLi)=>{
@@ -21,17 +25,14 @@
         },
         clearActive(){
             $(this.el).find('.active').removeClass('active');
-        },
-        activeItem(li){
-            let $li = $(li)
-            $li.addClass('active').siblings('.active').removeClass('active');
         }
     }
     let model = {
         data:{
             songs:[
                 // {id:1,name:'1',url:''},
-            ]
+            ],
+            selectSongId:undefined
         },
         find(){
             var query = new AV.Query('Song');
@@ -65,8 +66,12 @@
         bindEvents(){
             //点击歌曲就激活 ，同时移除新建歌曲的激活态
             $(this.view.el).on('click','li',(e)=>{
-                this.view.activeItem(e.currentTarget)
                 let songId = e.currentTarget.getAttribute('data-song-id')
+                
+                //根据选择的歌曲id更新视图列表
+                this.model.data.selectSongId = songId;
+                this.view.render(this.model.data)
+
                 //根据歌曲id查找歌曲信息发布到 编辑区(main部分)
                 let data;
                 let songs = this.model.data.songs;
