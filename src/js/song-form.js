@@ -97,20 +97,20 @@
             this.model = model;
             this.view.render(this.model.data);
             this.bindEvents();
-             // 订阅
-             window.eventHub.on('upload',(data)=>{
-                console.log('song-form 模块得到了 data');
-                this.model.data = data;
-                this.view.render(this.model.data);
-            })
 
             //用户选择了歌曲列表中一个，就处于编辑状态
             window.eventHub.on('select',(data)=>{
                 this.model.data = data;
                 this.view.render(this.model.data)
             })
-            window.eventHub.on('new',()=>{
-                this.model.data = {name:'',url:'',id:'',singer:''};
+            window.eventHub.on('new',(data)=>{
+                // 如果是上传后获取的歌曲信息是没有id的  点击新建歌曲不应该清空表单
+                // 如果是编辑的歌曲是有id的 点击新建就应该清空
+                if(this.model.data.id){
+                    this.model.data = {name:'',url:'',id:'',singer:''};
+                }else{
+                    Object.assign(this.model.data,data);
+                }
                 this.view.render(this.model.data)
             })
         },

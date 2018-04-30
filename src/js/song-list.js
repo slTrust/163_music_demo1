@@ -84,14 +84,11 @@
             })
         },
         bindEventHub(){
-            window.eventHub.on('upload',()=>{
-                // 如果有人上传歌曲了  就清除列表里的激活状态
-                this.view.clearActive()
-            });
             window.eventHub.on('create',(songData)=>{
                 this.model.data.songs.push(songData)
                 this.view.render(this.model.data);
             }) 
+             // 如果有人新建歌曲了  就清除列表里的激活状态
             window.eventHub.on('new',()=>{
                 this.view.clearActive()
             })

@@ -60,7 +60,7 @@
                     console.log(sourceLink)
                     
                     // 分发
-                    window.eventHub.emit('upload',{
+                    window.eventHub.emit('new',{
                         url:sourceLink,
                         name:res.key
                     })
